@@ -17,6 +17,13 @@ This README would normally document whatever steps are necessary to get your app
 * How to run tests
 * Deployment instructions
 
+### Running **sample logs** in `src\sample`
+```javascript
+node src/index.js -f "../sample/log.txt" -abop
+```
+![screenshot](./assets/img/screenshot.png)
+
+
 ### Contribution guidelines ###
 
 * Writing tests

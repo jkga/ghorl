@@ -5,6 +5,7 @@ const path = require('path')
 const url = require('url')
 
 let docYaml = {}
+let languagePath = '../languages.yml'
 
 /**
  * String Parser
@@ -32,7 +33,7 @@ let docYaml = {}
   */
 
  try {
-  docYaml = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, './languages.yml'), 'utf8'));
+  docYaml = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, languagePath), 'utf8'));
 } catch (e) {
   throw new Error('Unable to load languages')
 }

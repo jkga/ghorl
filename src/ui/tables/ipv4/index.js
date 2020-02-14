@@ -23,13 +23,14 @@ let ui = {
     // index of current page
     if(opt.page > 1) start = opt.page-1 === 0? 1 : (opt.page-1) * limit
     // header
-    table.push([chalk.red(`Current Page : 1`), chalk.red(`Total Page: ${numberOfPage}`), 'Hits'])
+    table.push([chalk.red(`Current Page : ${opt.page}`), chalk.red(`Total Page: ${numberOfPage}`), 'Hits'])
     for (let [key, value] of Object.entries(data.addresses)) {
       counter++
+
       // page 1
-      if(opt.page === 1) if(counter <= limit)table.push([counter, key, value.total])
+      if((opt.page == 1) && counter <= limit) table.push([counter, key, value.total || 0])
       // page > 1
-      if(opt.page > 1) {
+      if(opt.page > 1) { 
         if(counter >= start && counter <= start+limit) table.push([counter, chalk.yellow(`${key}`), value.total])
       }
     }

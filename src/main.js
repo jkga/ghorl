@@ -43,6 +43,7 @@ let data = {
   protocol: {
     total: 0
   },
+  raw : [],
   requests: Object.assign({}, requestsGeneralTemplate),
 }
 
@@ -58,6 +59,8 @@ module.exports = ((file, options = {}) => {
       if(!res.url) return
       // total
       data.requests.total++
+      // raw logs
+      data.raw.push(res)
       // ipv4 addresses
       if(!data.addresses[res.ipv4]) {
         data.addresses[res.ipv4] = {
@@ -73,6 +76,7 @@ module.exports = ((file, options = {}) => {
             },
             total: 0,
           },
+          raw: [],
           total: 0,
         }
       }
@@ -109,6 +113,8 @@ module.exports = ((file, options = {}) => {
           total: 0,
         }
       }
+
+      data.addresses[res.ipv4].raw.push(res)
 
 
         //data.addresses.total++

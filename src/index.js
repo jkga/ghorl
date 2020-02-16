@@ -1,17 +1,16 @@
 
 const path = require('path')
 const program = require('commander')
-const chalk = require('chalk');
 const board = require('./ui/board')
 const main = require('./main')
 const Ora = require('ora');
-const generalHeader = require('./ui/tables/header')
-const generalOS= require('./ui/tables/os')
-const ipv4Header = require('./ui/tables/ipv4/header')
-const ipv4Browser = require('./ui/tables/ipv4/browser')
-const generalAddresses = require('./ui/tables/ipv4//index')
-
-let file = ''
+const stripAnsi = require('strip-ansi')
+const blessed = require('blessed')
+const contrib = require('blessed-contrib')
+const headerBar = require('./ui/graph/headers')
+const OSBar = require('./ui/graph/os')
+const IPv4Bar = require('./ui/graph/ipv4')
+const rawLogs = require('./ui/graph/logs')
 
 program
 .option('-f, --file <string>', 'File source')
@@ -26,8 +25,8 @@ program
 .option('--dump', 'Dump results to console')
 program.parse(process.argv);
 
-let progOpts = program.opts()
-let options = {
+const progOpts = program.opts()
+const options = {
   verbose: progOpts.verbose,
   address: progOpts.address,
   browser: progOpts.browser,
@@ -37,58 +36,28 @@ let options = {
   dump: progOpts.dump,
 }
 
+let screen = {}
+let grid = {}
+let screenLogger = {}
+let tabIndex = 0
+let file = ''
+
+
 const spinner = new Ora({
   color: 'yellow',
   text: 'Reading Logs . . .\n',
 })
 
-let success = () => {
+const success = () => {
   spinner.text = 'Done'
   spinner.color = 'green'
   spinner.succeed()
 }
 
-let readingStat = () => {
-  spinner.text = 'Generating statistics'
-  spinner.color = 'yellow'
-  spinner.start()
-}
-
-let saving = () => {
-  spinner.start()
-  spinner.text = `Saving to ${program.save}`
-  spinner.color = 'yellow'
-}
-
-let showIpv4Stat = (data) => {
-  // ipv4
-  console.log(chalk.green(`\n\nREQUESTS HEADERS (${progOpts.ipv4})`))
-  ipv4Header.header({METHOD: 'Total'})
-  ipv4Header.push(data.addresses[progOpts.ipv4].requests)
-  console.log(ipv4Header.render())
-
-  // browser
-  console.log(chalk.green(`\n\nBROWSERS (${progOpts.ipv4})`))
-  ipv4Browser.header([chalk.green('Browser'),chalk.green('OS'),chalk.green('Method')])
-  ipv4Browser.push(data.addresses[progOpts.ipv4].browsers).then(res => { console.log(ipv4Browser.render()) })
-
-  success()
-}
-
-let showGeneralStat = (data) => { 
-  // ipv4
-  console.log(chalk.green(`\n\nREQUESTS HEADERS (GENERAL)`))
-  generalHeader.header({METHOD: 'Total'})
-  generalHeader.push(data.requests)
-  console.log(generalHeader.render())
-
-  // operating system
-  console.log(chalk.green(`\n\nOPERATING SYSTEMS (GENERAL)`))
-  generalOS.header({OS: 'Total'})
-  generalOS.push(data)
-  console.log(generalOS.render())
-
-  success()
+const IPv4keyPress = (item, index, data) => { 
+  let filtered = item.content.split(' ').filter(function (el) { return el != '' })
+  rawLogs (screen, grid, contrib, data.addresses[stripAnsi(filtered[1].trim())])
+  screenLogger.log(`Selected an item : ${filtered[1]}`)
 }
 
 // show welcome message
@@ -98,20 +67,60 @@ if(program.file) {
   file = path.resolve(__dirname, program.file)
   console.log(`Source: ${file}`)
 
-
+  // loading
   spinner.start()
 
   main(file,options).then(res => {
     success()
-    if(progOpts.dump) console.log(res)
-    if(progOpts.ipv4) return (readingStat () | showIpv4Stat (res))
-    showGeneralStat (res)
 
-    // operating system
-    console.log(chalk.green(`\n\nIP ADDRESSES (GENERAL)`))
-    generalAddresses.header(['IPV4'])
-    generalAddresses.push(res, {page: progOpts.page})
-    console.log(generalAddresses.render())
+    // start main screen
+    screen = blessed.screen()
+    grid = new contrib.grid({rows: 12, cols: 12, screen: screen})
     
+    // for verbose inspection
+    if(progOpts.dump) console.log(res)
+
+    // event logs
+    screenLogger = grid.set(8, 0, 1, 9, blessed.log, { 
+      fg: "green",
+      selectedFg: "green",
+      label: 'Event Logs'
+    })
+
+    // graphs and tables
+    let logTab = rawLogs (screen, grid, contrib, res)
+    let headerTab = headerBar(screen, grid, contrib, res)
+    let OSTab = OSBar (screen, grid, contrib, res)
+    let ipv4Tab = IPv4Bar (screen, grid, contrib, res, {onSelect: IPv4keyPress})
+
+
+    // enable shifting focus to table using tab key
+    screen.key(['tab'], function(ch, key) {
+      Promise.all([ipv4Tab, logTab, OSTab]).then(val => {
+        let screenTabs = [ipv4Tab, logTab, OSTab] 
+
+        // select new tab and reset to first once exceed the maximum length
+        if(tabIndex >= screenTabs.length) tabIndex = 0
+
+        // shift tab
+        screenTabs[tabIndex].then((tabInstance) => {
+          tabInstance.focus() 
+          screen.render ()
+          tabIndex++
+          screenLogger.log('Shifting tab focus')
+        }).catch(e => { 
+          screenLogger.log(e.message)
+        })
+      })
+    })
+
+    // enable esc key
+    screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+      return process.exit(0);
+    }) 
+    
+
+    screen.render()
+
   })
 }

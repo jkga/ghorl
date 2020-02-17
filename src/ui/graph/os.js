@@ -22,6 +22,7 @@ const OSBar =  async (screen, grid, contrib, data) => {
       }
       resolve(d)
     }).then((res) => {
+      table.focus()
       table.setData({headers: ['Name', 'Total'], data: res}) 
       screen.render()
       resolve(table)

@@ -3,24 +3,14 @@ const chalk = require('chalk')
 
 const pager = (table, screen, grid, contrib, data, opt = {page: 1}) => {
   table.rows.on('select', (item, index) => {
-    // only alllow next and back
-    let i = item.content.split(' ')
-    let allowBtn = ["\u001b[32mNext", "\u001b[32mBack", "Page"]
-    let filtered = i.filter(function (el) {
-      return el != ''
-    })
-
-    if(allowBtn.indexOf(filtered[0]) != -1 && (filtered[1] || 1)) {
-      opt.page = parseInt(filtered[1])
-      return ipv4 (screen, grid, contrib, data, opt)
-    } 
-
-    if(opt.onSelect) opt.onSelect (item, index, data)
+    if(opt.onSelect) opt.onSelect (item, index, data, opt)
   })
 }
 const ipv4 =  async (screen, grid, contrib, data, opt = {page: 1}) => {
 
   let table = grid.set(0, 2, 8, 2, contrib.table, { keys: true
+    , interactive: true
+    , vi: true
     , fg: 'white'
     , selectedFg: 'white'
     , selectedBg: 'blue'
@@ -56,12 +46,13 @@ const ipv4 =  async (screen, grid, contrib, data, opt = {page: 1}) => {
       }
       // pager
       d.push(['Page :    ', `${opt.page}`, `Total: ${numberOfPage}`])
+      d.push([chalk.green('Logs'), '', ''])
       d.push([chalk.green('Back', '  ', ` ${(opt.page - 1) || 1}`)])
       d.push([chalk.green('Next', '  ', ` ${opt.page + 1}`)])
       resolve(d)
     }).then((res) => {
-      table.setData({headers: ['Index', 'Address', 'Total'], data: res}) 
       table.focus()
+      table.setData({headers: ['Index', 'Address', 'Total'], data: res}) 
       pager(table, screen, grid, contrib, data, opt)
       screen.render() 
       resolve(table)

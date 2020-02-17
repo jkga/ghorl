@@ -17,7 +17,8 @@
     "blessed-contrib": "^4.8.18",
     "chalk": "^3.0.0",
     "cli-table": "^0.3.1",
-    "ora": "^4.0.3"
+    "ora": "^4.0.3",
+    "puppeteer": "^2.1.1"
   },
   "resolutions": {
     "chalk": "2.4.2",
@@ -29,6 +30,21 @@
     "esprima": "3.0.0",
     "strip-ansi": "3.0.1",
     "ansi-regex": "2.1.1",
-    "optimist": "0.2.8"
+    "optimist": "0.2.8",
+    "readable-stream": "2.3.7",
+    "isarray": "1.0.0",
+    "string_decoder": "1.1.1",
+    "nopt": "4.0.1",
+    "needle": "2.3.2",
+    "debug": "3.2.6",
+    "ms": "2.1.2",
+    "minimist": "1.2.0",
+    "safe-buffer": "5.1.2",
+    "string-width": "2.1.1",
+    "is-fullwidth-code-point": "2.0.0",
+    "sprintf-js": "1.1.2",
+    "colors": "1.4.0",
+    "yauzl": "2.10.0",
+    "fd-slicer": "1.1.0"
   }
 }

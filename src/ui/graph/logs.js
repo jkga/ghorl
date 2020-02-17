@@ -1,6 +1,13 @@
-const logs =  async (screen, grid, contrib, data, opt = {page: 1}) => {
+const pager = (table, screen, grid, contrib, data, opt = {page: 1}) => {
+  table.rows.on('select', (item, index) => {
+    if(opt.onSelect) opt.onSelect (item, index, data, opt)
+  })
+}
 
-  let table = grid.set(0, 4, 8, 5, contrib.table, { keys: true
+const logs =  async (screen, grid, contrib, data, opt = {page: 1}) => {
+  const chalk = require('chalk')
+
+  let table = grid.set(0, 4, 6, 8, contrib.table, { keys: true
     , fg: 'white'
     , selectedFg: 'white'
     , selectedBg: 'blue'
@@ -10,7 +17,7 @@ const logs =  async (screen, grid, contrib, data, opt = {page: 1}) => {
     , height: '30%'
     , border: {type: "line", fg: "green"}
     , columnSpacing: 4 //in chars
-    , columnWidth: [14, 22, 5, 45, 5] 
+    , columnWidth: [5, 14, 22, 5, 50, 5] 
     ,
   })
 
@@ -29,17 +36,25 @@ const logs =  async (screen, grid, contrib, data, opt = {page: 1}) => {
       for (let [key, value] of Object.entries(data.raw)) {
         counter++
         // page 1
-        if((opt.page == 1) && counter <= limit)  await Promise.resolve(d.push([value.ipv4, value.date, value.method, value.url, value.code]))
+        if((opt.page == 1) && counter <= limit)  await Promise.resolve(d.push([counter, value.ipv4, value.date, value.method, value.url, value.code]))
         // page > 1
         if(opt.page > 1) { 
-          if(counter >= start && counter <= start+limit) await Promise.resolve(d.push([value.ipv4, value.date, value.method, value.url, value.code]))
+          if(counter >= start && counter <= start+limit) await Promise.resolve(d.push([counter, value.ipv4, value.date, value.method, value.url, value.code]))
         }
 
       }
+
+      // pager
+      d.push(['Page :    ', `${opt.page}`, `Total: ${numberOfPage}`, '', ''])
+      d.push([chalk.green('Back', '  ', ` ${(opt.page - 1) || 1}`, '', '')])
+      d.push([chalk.green('Next', '  ', ` ${opt.page + 1}`, '', '')])
+
       resolve(d)
     }).then((res) => {
-      table.setData({headers: ['IPv4', 'Date', 'Method', 'URI', 'Code'], data: res}) 
+      table.focus()
+      table.setData({headers: ['   ', 'IPv4', 'Date', 'Method', 'URI', 'Code'], data: res}) 
       screen.render()
+      pager(table, screen, grid, contrib, data, opt)
       resolve(table)
     })
   })

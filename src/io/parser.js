@@ -52,11 +52,12 @@ const parser = {
       method: str[5] ? str[5].replace('"', '') : '',
       url: str[6] || '',
       protocol: str[7] ? str[7].replace('"', '') : '',
-      response: str[8] ? str[8] : '',
+      code: str[8] ? str[8] : '',
       referer: str[10] ? str[10] : '',
       language: progLang,
       agent,
-      browser: browser(agent)
+      browser: browser(agent),
+      raw: string,
     }
   },
   arrayToString: async (string, from, to) => {

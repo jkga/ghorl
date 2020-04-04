@@ -1,26 +1,27 @@
 # GHORL #
-This tool is currently in alpha stage and still NOT RECOMMENDED for enterprise use. This is just an additional tool for analyzing **CPanel access logs**
+CLI tool for auditing **cPanel raw access logs**.   
+Are you enjoying this so far or do you even think this project is cool?   
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F2F71KUIX)
+
+![image](https://user-images.githubusercontent.com/10413754/78453179-a0b26400-76c2-11ea-847b-8b90cb7cc208.png)
 
 ## Requirements
 * Nodejs <12.16.0>
 
-## Commands
-Default
+## Command
 ```javascript
   node ./src/index.js -f "C:/Users/Anon/Downloads/example.com-ssl_log-Feb-2020"
 ```   
-Next page(IPv4)
-```javascript
-  node ./src/index.js -f "C:/Users/Anon/Downloads/example.com-ssl_log-Feb-2020" --page 2
-```
 
-Inspect IP Address
-```javascript
-  node ./src/index.js -f "C:/Users/Anon/Downloads/example.com-ssl_log-Feb-2020" --ipv4 192.168.1.1
-```
+## WIP
+Support for parsing big files with disk caching mechanism
 
-## Background
-Once upon a time, there once a girl who lives in a far far second traffic capital of Laguna.
+
+## Background   
+
+TLDR; Just nonsense story in fast forward   
+   
+   Once upon a time, there once a girl who lives in a far far second traffic capital of Laguna.
 She is madly deeply inlove with a very handsome IT guy working as a developer knowledgable 
 in **Node, IOT, IOS and Phyton**. They love each other and promised to be always together whatever
 things they will face along their f****ing way.   
@@ -84,7 +85,7 @@ locate the script kiddies powered by the demon. This will give us an overview wh
 ***Main Characters***   
 
 a) **Ghorl - the inlove lovely ghorl**     
-b) **Khoyang - The very handsome knowledgable IT, hacker wannabe and self proclaimed network security analyst**
+b) **Khoyang - The very handsome knowledgable IT, hacker wannabe and self proclaimed network security analyst**   
 c) **DEMON - the Big Brother voice alike**
 
 ***Special Participation***   
